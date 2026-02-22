@@ -19,7 +19,7 @@ export default function CustomTabBar({
           ]}
         >
           <Ionicons
-            name="home-outline"
+            name={isFocused(0) ? "home" : "home-outline"}
             size={24}
             color={isFocused(0) ? "#000" : "#FFF"}
           />
@@ -82,19 +82,20 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     alignSelf: "center",
+    width: "50%",
     flexDirection: "row",
     backgroundColor: "#1A1A1A",
     borderRadius: 42,
-    paddingHorizontal: 35,
-    paddingVertical: 14,
-    width: "55%",
-    justifyContent: "space-between",
+    height: 50,
+    paddingHorizontal: 22,
+    justifyContent: "center",
     alignItems: "center",
+    gap: 11,
   },
   iconWrapper: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 40,
+    height: 40,
+    borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
   },

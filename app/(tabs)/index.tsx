@@ -1,4 +1,4 @@
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import React from "react";
 import {
   Dimensions,
@@ -97,24 +97,10 @@ function Header() {
    Hero Polaroids
 ========================= */
 
-function PolaroidStack() {
-  return (
-    <View style={styles.polaroidContainer}>
-      <View style={[styles.polaroid, styles.polaroidLeft]}>
-        <View style={styles.polaroidInner} />
-      </View>
-      <View style={[styles.polaroid, styles.polaroidRight]}>
-        <View style={styles.polaroidInner} />
-      </View>
-    </View>
-  );
-}
-
 function WelcomeSection() {
   return (
     <View style={styles.heroSection}>
-      <PolaroidStack />
-      <View style={{ marginTop: 32, alignItems: "center" }}>
+      <View style={{ alignItems: "center" }}>
         <Text style={styles.greetingGray}>Hi Emma</Text>
         <Text style={styles.greetingBold}>Welcome</Text>
       </View>
@@ -126,13 +112,8 @@ function ActionArea() {
   return (
     <View style={styles.actionArea}>
       <TouchableOpacity style={styles.scanBtn}>
-        <MaterialCommunityIcons
-          name="camera-iris"
-          size={30}
-          color="#fff"
-          style={{ marginBottom: 4 }}
-        />
         <Text style={styles.scanBtnText}>Scan</Text>
+        <View style={styles.scanCornerCircle} />
       </TouchableOpacity>
 
       <View style={styles.actionStack}>
@@ -165,9 +146,18 @@ export default function HomePage() {
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.pageContent}>
           <Header />
-          <View style={{ flex: 1, justifyContent: "center" }}>
+          <View style={{ flex: 1 }}>
             <WelcomeSection />
-            <ActionArea />
+
+            {/* 16:9 Rectangle */}
+            <View style={styles.previewWrapper}>
+              <View style={styles.previewBoxBack} />
+              <View style={styles.previewBox} />
+            </View>
+
+            <View style={styles.buttonWrapper}>
+              <ActionArea />
+            </View>
           </View>
         </View>
       </SafeAreaView>
@@ -222,76 +212,56 @@ const styles = StyleSheet.create({
   settingText: {
     fontSize: 20,
     color: "#181818",
-    fontWeight: "600",
+    fontWeight: "300",
     letterSpacing: 0.4,
   },
 
   heroSection: {
     alignItems: "center",
-    marginBottom: 36,
-  },
-  polaroidContainer: {
-    width: 200,
-    height: 156,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  polaroid: {
-    position: "absolute",
-    width: 122,
-    height: 141,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    justifyContent: "flex-end",
-    alignItems: "center",
-    elevation: 6,
-  },
-  polaroidLeft: {
-    left: 17,
-    transform: [{ rotate: "-8deg" }],
-  },
-  polaroidRight: {
-    left: 56,
-    transform: [{ rotate: "11deg" }],
-  },
-  polaroidInner: {
-    width: 106,
-    height: 96,
-    backgroundColor: "#F4F6F8",
-    borderRadius: 7,
-    marginBottom: 15,
+    marginTop: 180,   // controls vertical position of Hi Emma / Welcome
+    marginBottom: 60,
+    zIndex: 2,
   },
 
   greetingGray: {
-    color: "#737373",
-    fontSize: 18,
-    marginBottom: 4,
+    color: "#181818",
+    fontSize: 50,
+    marginBottom: -8,
+    fontWeight: "300",
   },
   greetingBold: {
     color: "#181818",
-    fontSize: 28,
+    fontSize: 46,
     fontWeight: "700",
   },
 
   actionArea: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 38,
   },
   scanBtn: {
     backgroundColor: "#181818",
     borderRadius: 18,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 17,
-    paddingHorizontal: 30,
-    minWidth: 96,
-    minHeight: 96,
+    width: 175,
+    height: 137,
+    paddingTop: 14,
+    paddingLeft: 16,
+    alignItems: "flex-start",
   },
   scanBtnText: {
     color: "#fff",
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "400",
+  },
+  scanCornerCircle: {
+    position: "absolute",
+    right: 12,
+    bottom: 12,
+    width: 80,
+    height: 77,
+    borderRadius: 80,
+    borderWidth: 26,
+    borderColor: "#FFFFFF",
   },
   actionStack: {
     marginLeft: 16,
@@ -301,23 +271,67 @@ const styles = StyleSheet.create({
     borderWidth: 1.6,
     borderColor: "#181818",
     borderRadius: 15,
-    paddingVertical: 13,
-    alignItems: "center",
-    minWidth: 104,
+    backgroundColor: "#FFFFFF",
+    width: 175,
+    height: 72,
+    paddingTop: 10,
+    paddingLeft: 14,
   },
   importBtnText: {
     color: "#181818",
-    fontWeight: "700",
+    fontWeight: "400",
+    fontSize: 28,
   },
   editBtn: {
     borderRadius: 15,
     backgroundColor: "#ECECEC",
-    paddingVertical: 13,
-    alignItems: "center",
-    minWidth: 104,
+    borderWidth: 1.6,
+    borderColor: "#181818",
+    width: 175,
+    height: 53,
+    paddingTop: 8,
+    paddingLeft: 14,
+    alignItems: "flex-start",
   },
   editBtnText: {
     color: "#181818",
-    fontWeight: "700",
+    fontWeight: "400",
+    fontSize: 28,
+  },
+
+  previewWrapper: {
+    position: "absolute",
+    top: 20,          // move slightly higher
+    right: 15,         // closer to edge
+    zIndex: 0,
+  },
+
+  previewBoxBack: {
+    position: "absolute",
+    left: -190,              // move to left side
+    bottom: -345,           // move downward
+    width: 144,
+    aspectRatio: 5 / 8,
+    backgroundColor: "#F3F3F3",
+    borderRadius: 2,
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+    transform: [{ rotate: "187deg" }],
+  },
+
+  previewBox: {
+    width: 130,                 // 180 × 0.8
+    aspectRatio: 5 / 8,
+    backgroundColor: "#F3F3F3",
+    borderRadius: 2,           // 12 × 0.8 ≈ 10
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+    transform: [{ rotate: "-7.15deg" }],
+  },
+
+  buttonWrapper: {
+    position: "absolute",
+    bottom: 80,   // FIXED position of buttons
+    alignSelf: "center",
   },
 });
