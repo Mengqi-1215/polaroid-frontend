@@ -2,17 +2,17 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-    Dimensions,
-    Image,
-    Text,
-    TouchableOpacity,
-    View
+  Dimensions,
+  Image,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 
 const PLACEHOLDER_IMAGES = [
-  "https://placehold.co/200x240/png?text=1",
-  "https://placehold.co/200x240/png?text=2",
-  "https://placehold.co/200x240/png?text=3",
+  "https://pub-c1e4e5b151e64a3ca4a4f9001123221f.r2.dev/public%3Awelcome%3A1.jpg",
+  "https://pub-c1e4e5b151e64a3ca4a4f9001123221f.r2.dev/public%3Awelcome%3A2.jpg",
+  "https://pub-c1e4e5b151e64a3ca4a4f9001123221f.r2.dev/public%3Awelcome%3A3.jpg",
 ];
 
 const FILM_SIZES = [
