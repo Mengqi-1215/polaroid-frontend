@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Dimensions, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Dimensions, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
 import DotGridBg from "../components/DotGridBg";
 import { useAuth } from "../context/AuthContext";
 
@@ -30,59 +30,11 @@ export default function Login() {
   const gridTop = height / 3;
 
   const handleLogin = async () => {
-    console.log("[Login] pressed", { email: emailTrimmed, passwordLen: passwordTrimmed.length, emailLooksOk, canSubmit });
+    console.log("[Login] DEV MODE – skipping backend");
 
-    // Hard stop: do not proceed unless inputs look valid
-    if (!emailTrimmed || !passwordTrimmed) {
-      Alert.alert("Login failed", "Please enter email and password.");
-      return;
-    }
-
-    if (!emailLooksOk) {
-      Alert.alert("Login failed", "Please enter a valid email.");
-      return;
-    }
-
-    if (submitting) return;
-
-    setSubmitting(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: emailTrimmed, password: passwordTrimmed }),
-      });
-
-      const json = await res.json().catch(() => null);
-      if (!res.ok || !json?.success) {
-        setLoginError(true);
-        Alert.alert("Login failed", json?.message || "Invalid credentials");
-        return;
-      }
-
-      // backend: { success:true, data:{ token, user:{ id,email } } }
-      const token: string | undefined = json?.data?.token;
-      const userId: string | undefined = json?.data?.user?.id;
-
-      if (!token || !userId) {
-        Alert.alert("Login failed", "Backend did not return token/userId.");
-        return;
-      }
-
-      // Minimal wiring: store temporarily on global for now.
-      // Later we can move this into AuthContext + SecureStore/AsyncStorage.
-      (globalThis as any).__POLAROID_TOKEN__ = token;
-      (globalThis as any).__POLAROID_USER_ID__ = userId;
-
-      // keep existing app auth flow
-      login();
-
-      router.replace("/(tabs)");
-    } catch (e: any) {
-      Alert.alert("Network error", e?.message || "Failed to fetch");
-    } finally {
-      setSubmitting(false);
-    }
+    // 🔴 临时跳过后端验证
+    login(); // 保持现有 AuthContext 流程
+    router.replace("/(tabs)");
   };
 
   return (
@@ -284,19 +236,10 @@ export default function Login() {
       >
         <TouchableOpacity
           onPress={() => {
-            // If disabled, show why instead of silently navigating
-            if (!emailTrimmed || !passwordTrimmed) {
-              Alert.alert("Login failed", "Please enter email and password.");
-              return;
-            }
-            if (!emailLooksOk) {
-              Alert.alert("Login failed", "Please enter a valid email.");
-              return;
-            }
-            if (submitting) return;
+            // DEV MODE: always allow navigation
             handleLogin();
           }}
-          disabled={!canSubmit}
+          disabled={false}
           activeOpacity={0.85}
           style={{
             borderRadius: 24,
@@ -305,7 +248,7 @@ export default function Login() {
             paddingVertical: 14,
             flexDirection: "row",
             alignItems: "center",
-            opacity: canSubmit ? 1 : 0.45,
+            opacity: 1,
           }}
         >
           <Text

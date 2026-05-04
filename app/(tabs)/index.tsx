@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Dimensions,
@@ -108,16 +109,22 @@ function WelcomeSection() {
   );
 }
 
-function ActionArea() {
+function ActionArea({
+  onImportPress,
+  onScanPress,
+}: {
+  onImportPress: () => void;
+  onScanPress: () => void;
+}) {
   return (
     <View style={styles.actionArea}>
-      <TouchableOpacity style={styles.scanBtn}>
+      <TouchableOpacity style={styles.scanBtn} onPress={onScanPress} activeOpacity={0.85}>
         <Text style={styles.scanBtnText}>Scan</Text>
         <View style={styles.scanCornerCircle} />
       </TouchableOpacity>
 
       <View style={styles.actionStack}>
-        <TouchableOpacity style={styles.importBtn}>
+        <TouchableOpacity style={styles.importBtn} onPress={onImportPress}>
           <Text style={styles.importBtnText}>Import</Text>
         </TouchableOpacity>
 
@@ -134,6 +141,7 @@ function ActionArea() {
 ========================= */
 
 export default function HomePage() {
+  const router = useRouter();
   const { width, height } = Dimensions.get("window");
 
   const gridHeight = height / 2;
@@ -156,7 +164,10 @@ export default function HomePage() {
             </View>
 
             <View style={styles.buttonWrapper}>
-              <ActionArea />
+              <ActionArea
+                onScanPress={() => router.push("/scan-presetting")}
+                onImportPress={() => router.push("/camera")}
+              />
             </View>
           </View>
         </View>

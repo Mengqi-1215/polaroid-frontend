@@ -8,6 +8,14 @@ export default function CustomTabBar({
 }: BottomTabBarProps) {
   const isFocused = (index: number) => state.index === index;
 
+  // Get current route name
+  const currentRoute = state.routes[state.index].name;
+
+  // Hide TabBar on Camera screen
+  if (currentRoute === "camera") {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       {/* Home */}
