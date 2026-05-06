@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Dimensions, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
 import DotGridBg from "../components/DotGridBg";
+import { apiFetch } from "../constants/api";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -21,20 +22,44 @@ export default function Login() {
   const emailLooksOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed);
   const canSubmit = emailTrimmed.length > 0 && passwordTrimmed.length > 0 && emailLooksOk && !submitting;
 
-  // iOS Simulator / Web: usually 127.0.0.1 works.
-  // Physical phone (Expo Go): must use your computer LAN IP.
-  const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://127.0.0.1:3001";
-
   const { width, height } = Dimensions.get("window");
   const gridHeight = height / 3 + 50;
   const gridTop = height / 3;
 
   const handleLogin = async () => {
-    console.log("[Login] DEV MODE – skipping backend");
+    if (!canSubmit) return;
 
-    // 🔴 临时跳过后端验证
-    login(); // 保持现有 AuthContext 流程
-    router.replace("/(tabs)");
+    try {
+      setSubmitting(true);
+      setLoginError(false);
+
+      const body = await apiFetch("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email: emailTrimmed,
+          password: passwordTrimmed,
+        }),
+      });
+
+      console.log("[Login success]", body);
+
+      const token = body?.data?.token;
+      if (!token) {
+        throw new Error("Login succeeded but no token was returned");
+      }
+
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("polaroid.token", token);
+      }
+
+      login();
+      router.replace("/(tabs)");
+    } catch (error) {
+      console.error("[Login error]", error);
+      setLoginError(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -235,11 +260,8 @@ export default function Login() {
         }}
       >
         <TouchableOpacity
-          onPress={() => {
-            // DEV MODE: always allow navigation
-            handleLogin();
-          }}
-          disabled={false}
+          onPress={handleLogin}
+          disabled={!canSubmit}
           activeOpacity={0.85}
           style={{
             borderRadius: 24,
@@ -248,7 +270,7 @@ export default function Login() {
             paddingVertical: 14,
             flexDirection: "row",
             alignItems: "center",
-            opacity: 1,
+            opacity: canSubmit ? 1 : 0.5,
           }}
         >
           <Text
