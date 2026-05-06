@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -66,35 +65,6 @@ function DotGridBg({ width, height, top = 0, left = 0 }: DotGridProps) {
 }
 
 /* =========================
-   Header
-========================= */
-
-function Header() {
-  const avatarDiameter = 44;
-
-  return (
-    <View style={styles.header}>
-      <View
-        style={{
-          width: avatarDiameter,
-          height: avatarDiameter,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <View style={styles.avatarCircle}>
-          <Feather name="eye" size={24} color="#181818" />
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.settingBtn}>
-        <Text style={styles.settingText}>Setting</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-/* =========================
    Hero Polaroids
 ========================= */
 
@@ -153,7 +123,6 @@ export default function HomePage() {
 
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.pageContent}>
-          <Header />
           <View style={{ flex: 1 }}>
             <WelcomeSection />
 
@@ -165,8 +134,8 @@ export default function HomePage() {
 
             <View style={styles.buttonWrapper}>
               <ActionArea
-                onScanPress={() => router.push("/scan-presetting")}
                 onImportPress={() => router.push("/camera")}
+                onScanPress={() => router.push("/camera-capture")}
               />
             </View>
           </View>
@@ -189,42 +158,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 22,
     paddingTop: 10,
-  },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  avatarCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#1A1A1A",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  settingBtn: {
-    borderWidth: 1,
-    borderColor: "#181818",
-    borderRadius: 22,
-    paddingHorizontal: 26,
-    paddingVertical: 8,
-    backgroundColor: "#fff",
-  },
-  settingText: {
-    fontSize: 20,
-    color: "#181818",
-    fontWeight: "300",
-    letterSpacing: 0.4,
   },
 
   heroSection: {

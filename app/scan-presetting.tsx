@@ -1,21 +1,18 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Dimensions,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
-const SAMPLE_PHOTO_URI =
-  "https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?q=80&w=1200&auto=format&fit=crop";
 
 export default function ScanPresettingScreen() {
   const router = useRouter();
+  const { photoUri } = useLocalSearchParams<{ photoUri?: string }>();
+  const capturedPhotoUri = typeof photoUri === "string" ? photoUri : undefined;
   const [processStep, setProcessStep] = useState<1 | 2>(1);
   const [progress, setProgress] = useState(0);
 
@@ -50,9 +47,7 @@ export default function ScanPresettingScreen() {
 
   return (
     <View style={styles.safeArea}>
-
       <View style={styles.screenContent}>
-
         <View style={styles.topActions}>
           <TouchableOpacity
             activeOpacity={0.78}
@@ -68,7 +63,7 @@ export default function ScanPresettingScreen() {
         </View>
 
         <View style={styles.previewArea}>
-          <PolaroidPreview />
+          <PolaroidPreview photoUri={capturedPhotoUri} />
         </View>
 
         {processStep === 1 ? (
@@ -126,25 +121,27 @@ export default function ScanPresettingScreen() {
             </View>
           </View>
         )}
-
       </View>
     </View>
   );
 }
 
-function PolaroidPreview() {
+function PolaroidPreview({ photoUri }: { photoUri?: string }) {
   return (
     <View style={styles.polaroidWrap}>
       <View style={[styles.paperShadow, styles.paperShadowBack, styles.paperShadowThird]} />
       <View style={[styles.paperShadow, styles.paperShadowMiddle]} />
 
       <View style={styles.polaroidPaper}>
-        <Image source={{ uri: SAMPLE_PHOTO_URI }} style={styles.polaroidImage} />
+        {photoUri ? (
+          <Image source={{ uri: photoUri }} style={styles.polaroidImage} />
+        ) : (
+          <View style={styles.emptyPhotoPlaceholder} />
+        )}
       </View>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -248,6 +245,11 @@ const styles = StyleSheet.create({
     width: 288.04,
     height: 386.535,
     resizeMode: "cover",
+  },
+  emptyPhotoPlaceholder: {
+    width: 288.04,
+    height: 386.535,
+    backgroundColor: "#111111",
   },
   bottomActionsRow: {
     position: "absolute",

@@ -52,7 +52,6 @@ export default function Camera() {
     };
   }, [navigation]);
 
-  // 响应式单元格尺寸
   const cellSize =
     (SCREEN_WIDTH - GALLERY_CELL_MARGIN * 2 * (GRID_COLS - 1)) /
     GRID_COLS;
@@ -73,14 +72,15 @@ export default function Camera() {
 
   const renderGalleryItem = ({ item, index }: { item: any; index: number }) => {
     const isSelected = selected.includes(index);
+
     return (
       <TouchableOpacity
         activeOpacity={0.82}
         onPress={() => {
-          setSelected(prev =>
+          setSelected((prev) =>
             prev.includes(index)
-              ? prev.filter(i => i !== index) // deselect if already selected
-              : [...prev, index] // add to selection
+              ? prev.filter((i) => i !== index)
+              : [...prev, index]
           );
         }}
         style={[
@@ -95,7 +95,6 @@ export default function Camera() {
           },
         ]}
       >
-        {/* 右下角小圆圈 */}
         <View style={styles.galleryItemCircleWrap}>
           <View
             style={[
@@ -118,7 +117,6 @@ export default function Camera() {
 
   return (
     <View style={styles.container}>
-      {/* 上部预览区 */}
       <View style={styles.previewSectionOuter}>
         <ImageBackground
           source={{ uri: bgUri }}
@@ -126,7 +124,6 @@ export default function Camera() {
           imageStyle={styles.woodBgImage}
           resizeMode="cover"
         >
-          {/* 左上角 Back 按钮 */}
           <TouchableOpacity
             style={[styles.backButton, { top: insets.top + 24 }]}
             activeOpacity={0.7}
@@ -134,7 +131,7 @@ export default function Camera() {
           >
             <Text style={styles.backButtonText}>Back</Text>
           </TouchableOpacity>
-          {/* 左下角步进器 */}
+
           <View style={styles.stepperContainer}>
             <View style={styles.stepperGroup}>
               <Svg width={124.68} height={40.89} viewBox="0 0 125 41">
@@ -167,12 +164,7 @@ Z
                   stroke="#000"
                   strokeWidth="1"
                 />
-                <Circle
-                  cx="62.3418"
-                  cy="20.4473"
-                  r="17"
-                  fill="#000"
-                />
+                <Circle cx="62.3418" cy="20.4473" r="17" fill="#000" />
                 <SvgText
                   x="20.4473"
                   y="20.4473"
@@ -212,7 +204,7 @@ Z
               </Svg>
             </View>
           </View>
-          {/* 右下角 Import 按钮 */}
+
           <TouchableOpacity
             style={[styles.importButton, { bottom: 24 }]}
             activeOpacity={0.8}
@@ -222,12 +214,12 @@ Z
           </TouchableOpacity>
         </ImageBackground>
       </View>
-      {/* 下部网格选择区 */}
+
       <View style={styles.gallerySection}>
         <FlatList
           data={galleryData}
           renderItem={renderGalleryItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
           numColumns={GRID_COLS}
           scrollEnabled={false}
           contentContainerStyle={styles.galleryContainer}
@@ -243,8 +235,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#121212",
     paddingTop: 0,
   },
-
-  // 上部预览区
   previewSectionOuter: {
     width: SCREEN_WIDTH,
     aspectRatio: 45 / 61,
@@ -268,24 +258,17 @@ const styles = StyleSheet.create({
     height: "100%",
     opacity: 0.91,
   },
-
-  // 胶囊 Back 按钮 (左上角)
   backButton: {
     position: "absolute",
     left: 24,
-
     width: 77,
     height: 28,
-
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#000",
-
     backgroundColor: "#FFF",
-
     alignItems: "center",
     justifyContent: "center",
-
     zIndex: 10,
   },
   backButtonText: {
@@ -294,35 +277,26 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     letterSpacing: 0.2,
   },
-
-
-  // 步进器 (左下角) 连接胶囊式
   stepperContainer: {
     position: "absolute",
     left: 24,
     bottom: 24,
     zIndex: 8,
   },
-
   stepperGroup: {
     width: 124.68,
     height: 40.89,
     alignItems: "center",
     justifyContent: "center",
   },
-
-  // Import 按钮 (右下角红色)
   importButton: {
     position: "absolute",
     bottom: 24,
     right: 24,
-
     width: 119,
     height: 40.162,
-
     borderRadius: 17.85,
     backgroundColor: "#CB2F2F",
-
     alignItems: "center",
     justifyContent: "center",
   },
@@ -335,8 +309,6 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     textAlignVertical: "center",
   },
-
-  // 下部 Gallery Grid 选择区
   gallerySection: {
     flex: 1,
     backgroundColor: "#181818",
