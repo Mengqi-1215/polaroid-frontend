@@ -1,31 +1,50 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Dimensions,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { getPhotoSignedUrl, processPhoto, uploadPhotoUri } from "../constants/api";
 
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+const SAMPLE_PHOTO_URI =
+  "https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?q=80&w=1200&auto=format&fit=crop";
 
 export default function ScanPresettingScreen() {
   const router = useRouter();
-  const { photoUri } = useLocalSearchParams<{ photoUri?: string }>();
-  const capturedPhotoUri = typeof photoUri === "string" ? photoUri : undefined;
+  const params = useLocalSearchParams<{ photoId?: string; imageUri?: string; photoUri?: string }>();
+  const initialPhotoId = typeof params.photoId === "string" ? params.photoId : "";
+  const initialImageUri =
+    typeof params.imageUri === "string"
+      ? params.imageUri
+      : typeof params.photoUri === "string"
+      ? params.photoUri
+      : SAMPLE_PHOTO_URI;
+
   const [processStep, setProcessStep] = useState<1 | 2>(1);
   const [progress, setProgress] = useState(0);
+  const [imageUri, setImageUri] = useState(initialImageUri);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processError, setProcessError] = useState("");
+  const [activePhotoId, setActivePhotoId] = useState(initialPhotoId);
 
   useEffect(() => {
-    if (processStep !== 2) return;
+    setImageUri(initialImageUri);
+    setActivePhotoId(initialPhotoId);
+  }, [initialImageUri, initialPhotoId]);
 
-    setProgress(0);
+  useEffect(() => {
+    if (processStep !== 2 || !isProcessing) return;
 
     const timer = setInterval(() => {
       setProgress((current) => {
-        if (current >= 100) {
-          clearInterval(timer);
-          return 100;
+        if (current >= 92) {
+          return current;
         }
 
         return current + 1;
@@ -33,7 +52,7 @@ export default function ScanPresettingScreen() {
     }, 60);
 
     return () => clearInterval(timer);
-  }, [processStep]);
+  }, [processStep, isProcessing]);
 
   const handleBack = () => {
     if (processStep === 2) {
@@ -45,9 +64,48 @@ export default function ScanPresettingScreen() {
     router.back();
   };
 
+  const handleAutoProcess = async () => {
+    setProgress(0);
+    setProcessError("");
+    setProcessStep(2);
+
+    try {
+      setIsProcessing(true);
+
+      let currentPhotoId = activePhotoId;
+
+      if (!currentPhotoId) {
+        const uploadResult = await uploadPhotoUri(imageUri);
+        currentPhotoId = uploadResult?.data?.id;
+
+        if (!currentPhotoId) {
+          throw new Error("Upload succeeded but no photo id was returned");
+        }
+
+        setActivePhotoId(currentPhotoId);
+      }
+
+      await processPhoto(currentPhotoId, "mini");
+      setProgress(96);
+
+      const processedSignedUrl = await getPhotoSignedUrl(currentPhotoId);
+      setImageUri(processedSignedUrl);
+      setProgress(100);
+    } catch (error) {
+      console.error("[Auto Process error]", error);
+      setProcessError(error instanceof Error ? error.message : "Auto Process failed");
+      setProcessStep(1);
+      setProgress(0);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <View style={styles.safeArea}>
+
       <View style={styles.screenContent}>
+
         <View style={styles.topActions}>
           <TouchableOpacity
             activeOpacity={0.78}
@@ -63,7 +121,7 @@ export default function ScanPresettingScreen() {
         </View>
 
         <View style={styles.previewArea}>
-          <PolaroidPreview photoUri={capturedPhotoUri} />
+          <PolaroidPreview imageUri={imageUri} />
         </View>
 
         {processStep === 1 ? (
@@ -71,10 +129,7 @@ export default function ScanPresettingScreen() {
             <TouchableOpacity
               activeOpacity={0.86}
               style={styles.autoCard}
-              onPress={() => {
-                setProgress(0);
-                setProcessStep(2);
-              }}
+              onPress={handleAutoProcess}
             >
               <View style={styles.redDivider} />
 
@@ -103,6 +158,7 @@ export default function ScanPresettingScreen() {
               </View>
 
               <Text style={styles.progressText}>{progress}%</Text>
+              {processError ? <Text style={styles.errorText}>{processError}</Text> : null}
             </View>
 
             <View style={styles.processTabs}>
@@ -121,27 +177,25 @@ export default function ScanPresettingScreen() {
             </View>
           </View>
         )}
+
       </View>
     </View>
   );
 }
 
-function PolaroidPreview({ photoUri }: { photoUri?: string }) {
+function PolaroidPreview({ imageUri }: { imageUri: string }) {
   return (
     <View style={styles.polaroidWrap}>
       <View style={[styles.paperShadow, styles.paperShadowBack, styles.paperShadowThird]} />
       <View style={[styles.paperShadow, styles.paperShadowMiddle]} />
 
       <View style={styles.polaroidPaper}>
-        {photoUri ? (
-          <Image source={{ uri: photoUri }} style={styles.polaroidImage} />
-        ) : (
-          <View style={styles.emptyPhotoPlaceholder} />
-        )}
+        <Image source={{ uri: imageUri }} style={styles.polaroidImage} />
       </View>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -246,11 +300,6 @@ const styles = StyleSheet.create({
     height: 386.535,
     resizeMode: "cover",
   },
-  emptyPhotoPlaceholder: {
-    width: 288.04,
-    height: 386.535,
-    backgroundColor: "#111111",
-  },
   bottomActionsRow: {
     position: "absolute",
     left: 24,
@@ -347,6 +396,14 @@ const styles = StyleSheet.create({
     fontSize: 39,
     fontWeight: "200",
     letterSpacing: -1.2,
+  },
+  errorText: {
+    position: "absolute",
+    right: 20,
+    bottom: 8,
+    color: "#CB2F2F",
+    fontSize: 10,
+    fontWeight: "400",
   },
   processTabs: {
     width: 350,

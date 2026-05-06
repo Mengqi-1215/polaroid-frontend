@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Dimensions, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
 import DotGridBg from "../components/DotGridBg";
-import { apiFetch } from "../constants/api";
+import { apiFetch, saveStoredToken } from "../constants/api";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -48,9 +48,7 @@ export default function Login() {
         throw new Error("Login succeeded but no token was returned");
       }
 
-      if (typeof localStorage !== "undefined") {
-        localStorage.setItem("polaroid.token", token);
-      }
+      await saveStoredToken(token);
 
       login();
       router.replace("/(tabs)");
