@@ -1,4 +1,4 @@
-import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -26,9 +26,9 @@ export default function CustomTabBar({
             isFocused(0) && styles.activeIconWrapper,
           ]}
         >
-          <Ionicons
-            name={isFocused(0) ? "home" : "home-outline"}
-            size={24}
+          <Feather
+            name="home"
+            size={23}
             color={isFocused(0) ? "#000" : "#FFF"}
           />
         </View>
@@ -90,15 +90,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     alignSelf: "center",
-    width: "50%",
+    width: 260,
     flexDirection: "row",
     backgroundColor: "#1A1A1A",
     borderRadius: 42,
     height: 50,
-    paddingHorizontal: 22,
-    justifyContent: "center",
+    paddingHorizontal: 10,
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: 11,
+    gap: 0,
   },
   iconWrapper: {
     width: 40,
